@@ -10,8 +10,10 @@ namespace ShoppingCart
     {
         static void Main(string[] args)
         {
-            float ttlPrice = 0f;
+            bool continueShopping = true;
+            int ttlUserQty = 0;
             var allProducts = new allProductsList();
+            var shoppingCart = new List<trolley>();
             var items = allProducts.InitialiseItem();
 
             Console.WriteLine("* List of the ALL items in our store * ");
@@ -22,15 +24,12 @@ namespace ShoppingCart
                 Console.WriteLine("Item Identity No : {0}", i.itemID);
                 Console.WriteLine("Item Name : {0}", i.itemName);
                 Console.WriteLine("Item Color : {0}", i.itemColor);
-                Console.WriteLine("Item Price : {0}", i.itemPrice);
+                Console.WriteLine("Item Price : NZD {0}", i.itemPrice);
                 Console.WriteLine("....................................................................");
             }
-
-            var addOn = 0;
-            do {
-
-
-
+           
+            do
+            {
                 Console.WriteLine("Please Enter the Identity No of the Item that you want to purchase : ");
                 var userID = 0;
 
@@ -42,13 +41,10 @@ namespace ShoppingCart
                     {
                         Console.WriteLine("Please re-enter the correct ID again : ");
                     }
-                    else
-                    { }
+                    else{ break; }
 
                 } while ((userID != 1) && (userID != 2) && (userID != 3) && (userID != 4) && (userID != 5));
-
-
-
+                
                 Console.WriteLine("System have found 1 Item is match with your ID input");
 
                 foreach (var p in items)
@@ -65,32 +61,32 @@ namespace ShoppingCart
                                     Console.WriteLine("Item ID No : {0}", s.itemID);
                                     Console.WriteLine("Item Name : {0}", s.itemName);
                                     Console.WriteLine("Item Color : {0}", s.itemColor);
-                                    Console.WriteLine("Item Price : {0}", s.itemPrice);
+                                    Console.WriteLine("Item Price : NZD {0}", s.itemPrice);
                                     Console.WriteLine("Item Suitable for: {0}", s.sDetail);
                                     Console.WriteLine("Item Suggest to : {0}", s.sSex);
                                     Console.WriteLine("....................................................................");
                                     break;
                                 }
-                            case "Car":
+                            case "car":
                                 {
-                                    var c = (Car)p;
+                                    var c = (car)p;
                                     Console.WriteLine("Item ID No : {0}", c.itemID);
                                     Console.WriteLine("Item Brand : {0}", c.cBrand);
                                     Console.WriteLine("Item Name : {0}", c.itemName);
                                     Console.WriteLine("Item Color : {0}", c.itemColor);
-                                    Console.WriteLine("Item Price: {0}", c.itemPrice);
+                                    Console.WriteLine("Item Price: NZD {0}", c.itemPrice);
                                     Console.WriteLine("Item Engine : {0}", c.cEngine);
                                     Console.WriteLine("Item Year : {0}", c.cYear);
                                     Console.WriteLine("....................................................................");
                                     break;
                                 }
-                            case "Furniture":
+                            case "furniture":
                                 {
-                                    var f = (Furniture)p;
+                                    var f = (furniture)p;
                                     Console.WriteLine("Item ID No : {0}", f.itemID);
                                     Console.WriteLine("Item Name : {0}", f.itemName);
                                     Console.WriteLine("Item Color : {0}", f.itemColor);
-                                    Console.WriteLine("Item Price: {0}", f.itemPrice);
+                                    Console.WriteLine("Item Price: NZD {0}", f.itemPrice);
                                     Console.WriteLine("Item Quantity : {0}", f.fQty);
                                     Console.WriteLine("Item Size : {0}", f.fSize);
                                     Console.WriteLine("....................................................................");
@@ -101,38 +97,80 @@ namespace ShoppingCart
                                     break;
                                 }
                         }
-                        ttlPrice = p.itemPrice + ttlPrice;
-                        
+
+                        Console.WriteLine("Please enter item quantity you want to buy : ");
+                        int userQty = Convert.ToInt32(Console.ReadLine());
+
+                        var chosenItem = new trolley
+                        {
+                            itemID = p.itemID,
+                            itemName = p.itemName,
+                            itemPrice = p.itemPrice,
+                            itemQty = userQty
+                        };
+
+                        shoppingCart.Add(chosenItem);
+                        ttlUserQty = ttlUserQty + userQty;
+                        Console.WriteLine("You have {0} product in your trolley", ttlUserQty);
+                        Console.WriteLine("Do you want to add on item? If YES, enter Y. ");
+                        string addOn = Console.ReadLine();
+                        if ((addOn == "Y") || (addOn == "y"))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Here is your Payment details :");
+                            displayReceipt(shoppingCart);
+                            
+                            Console.WriteLine("Do you want to do payment for the Item? If YES, please type 'Y' or 'y', else type 'N' or 'n' ");
+                            var y = Console.ReadLine();
+
+                            if ((y == "Y") || (y == "y"))
+                            {
+                                displayTotalPayment(shoppingCart);
+                                Console.WriteLine("Thank you for your purchase. See you! ");
+                            }
+                            else if ((y == "N") || (y == "n"))
+                            {
+                                Console.WriteLine("You are wasting my time! ");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Are you word blind? Only Y or N.");
+                            }
+
+                            continueShopping = false;
+                            Console.ReadKey();
+                        }
                     }
                 }
-               
-                Console.WriteLine("Do you want to add on item? If yes, enter 1. Else enter any digit numbers. ");
-                addOn = Convert.ToInt32(Console.ReadLine());
+            } while (continueShopping);
+        }
 
-
-            } while (addOn == 1);
-
-            Console.WriteLine("Do you want to purchase the Item ? If YES, please type 'Y' or 'y', else type 'N' or 'n' ");
-            var y = Console.ReadLine();
-
-            if ((y == "Y") || (y == "y"))
+        public static void displayReceipt(List<trolley> userShoppingCart)
+        {
+            foreach (var shopping in userShoppingCart)
             {
-                Console.WriteLine("Your payment : {0} ", ttlPrice);
-                Console.WriteLine("Thank you for your purchase. ");
+                Console.WriteLine(".....................................");
+                Console.WriteLine("Item number : {0}", shopping.itemID);
+                Console.WriteLine("Item Name : {0} * {1}", shopping.itemName, shopping.itemQty);
+                Console.WriteLine("Item Price : NZD {0} * {1} = NZD {2}", shopping.itemPrice, shopping.itemQty, shopping.itemPrice * shopping.itemQty);
+                Console.WriteLine(".....................................");
             }
-            else if ((y == "N") || (y == "n"))
-            {
-                Console.WriteLine("You are wasting my time! ");
-            }
-            else
-            {
-                Console.WriteLine("Are you word blind? Only Y or N.");
-            }
-            Console.ReadKey();
+        }
 
+        public static void displayTotalPayment(List<trolley> userShoppingCart)
+        {
+            float ttlPayment = 0;
+            foreach (var shopping in userShoppingCart)
+            {
+                ttlPayment = ttlPayment + (shopping.itemPrice * shopping.itemQty);
+            }
+            Console.WriteLine("Total payment: {0}",ttlPayment);
         }
     }
-
+    
     public class item
     {
         public int itemID { get; set; }
@@ -147,17 +185,25 @@ namespace ShoppingCart
         public string sSex { get; set;}
     }
 
-    public class Car : item
+    public class car : item
     {
         public string cBrand { get; set; }
         public int cYear { get; set; }
         public string cEngine { get; set; }
     }
 
-    public class Furniture : item
+    public class furniture : item
     {
         public int fQty { get; set; }
         public string fSize { get; set; }
+    }
+
+    public class trolley
+    {
+        public int itemID { get; set;}
+        public string itemName { get; set; }
+        public float itemPrice { get; set; }
+        public int itemQty { get; set; }
     }
 
     public class allProductsList : IproductRepository
@@ -186,7 +232,7 @@ namespace ShoppingCart
                     sSex = "Male"
                 },
 
-                new Car()
+                new car()
                 {
                     itemID = 3,
                     itemName = "Saga",
@@ -197,7 +243,7 @@ namespace ShoppingCart
                     cYear = 1990
                 },
 
-                new Car()
+                new car()
                 {
                     itemID = 4,
                     itemName = "Wira",
@@ -208,7 +254,7 @@ namespace ShoppingCart
                     cYear = 2000
                 },
 
-                new Furniture()
+                new furniture()
                 {
                     itemID = 5,
                     itemName = "Chiavari Chair",
@@ -220,6 +266,5 @@ namespace ShoppingCart
             };
             return items;
         }
-       
     }
 }
